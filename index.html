@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>图库 | 青云依兮</title>
+  <meta itemprop="image" content="/logo.jpg">
+  <meta name="description" itemprop="description" content="图库 | 探索视觉艺术的无限可能，发现世界的美好瞬间。">
+  <link rel="shortcut icon" href="/logo.jpg">
+  <!-- 引入Tailwind CSS -->
+  <script src="/3.4.17.css"></script>
+  <!-- 引入Font Awesome -->
+  <link href="/font-awesome.min.css" rel="stylesheet">
+
+  <!-- Tailwind配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#165DFF',
+            secondary: '#36BFFA',
+            dark: '#1E293B',
+            light: '#F8FAFC'
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <!-- 自定义工具类 -->
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .masonry-grid {
+        column-count: 1;
+        column-gap: 1.5rem;
+      }
+      @screen md {
+        .masonry-grid {
+          column-count: 2;
+        }
+      }
+      @screen lg {
+        .masonry-grid {
+          column-count: 3;
+        }
+      }
+      @screen xl {
+        .masonry-grid {
+          column-count: 4;
+        }
+      }
+      .masonry-item {
+        break-inside: avoid;
+        margin-bottom: 1.5rem;
+      }
+      .text-shadow {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .backdrop-blur {
+        backdrop-filter: blur(8px);
+      }
+    }
+  </style>
+</head>
+
+<body class="font-inter bg-light text-dark dark:bg-dark dark:text-light transition-colors duration-300">
+  <!-- 顶部导航栏 -->
+  <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" id="navbar">
+    <div class="container mx-auto px-4 py-4 flex items-center justify-between backdrop-blur bg-light/80 dark:bg-dark/80 shadow-sm">
+      <div class="flex items-center">
+        <h1 class="text-2xl font-bold text-primary">
+          <i class="fa fa-camera-retro mr-2"></i>图库
+        </h1>
+      </div>
+      
+      <!-- 搜索框 -->
+      <div class="hidden md:flex items-center flex-1 max-w-md mx-8">
+        <div class="relative w-full">
+          <input 
+            type="text" 
+            placeholder="搜索图片..." 
+            class="w-full pl-10 pr-4 py-2 rounded-full bg-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+            id="search-input"
+          >
+          <i class="fa fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+        </div>
+      </div>
+      
+      <!-- 导航菜单 -->
+      <nav class="flex items-center space-x-4">
+        <button class="md:hidden p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" id="mobile-search-btn">
+          <i class="fa fa-search"></i>
+        </button>
+        <button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" id="theme-toggle">
+          <i class="fa fa-moon-o dark:hidden"></i>
+          <i class="fa fa-sun-o hidden dark:inline-block"></i>
+        </button>
+        <button class="hidden md:block px-4 py-2 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors">
+          <i class="fa fa-upload mr-1"></i> 上传
+        </button>
+        <button class="md:hidden p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" id="mobile-menu-btn">
+          <i class="fa fa-bars"></i>
+        </button>
+      </nav>
+    </div>
+    
+    <!-- 移动端搜索框 -->
+    <div class="md:hidden hidden px-4 pb-4" id="mobile-search">
+      <div class="relative w-full">
+        <input 
+          type="text" 
+          placeholder="搜索图片..." 
+          class="w-full pl-10 pr-4 py-2 rounded-full bg-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+        >
+        <i class="fa fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+      </div>
+    </div>
+    
+    <!-- 移动端菜单 -->
+    <div class="md:hidden hidden bg-light dark:bg-dark shadow-lg absolute w-full" id="mobile-menu">
+      <div class="container mx-auto px-4 py-4 flex flex-col space-y-3">
+        <a href="#" class="px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <i class="fa fa-upload mr-2"></i>上传图片
+        </a>
+        <a href="#" class="px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <i class="fa fa-user mr-2"></i>个人中心
+        </a>
+        <a href="#" class="px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <i class="fa fa-heart mr-2"></i>我的收藏
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主内容区 -->
+  <main class="container mx-auto px-4 pt-28 pb-16">
+    <!-- 分类筛选 -->
+    <div class="mb-10 overflow-x-auto scrollbar-hide">
+      <div class="flex space-x-2 pb-2 min-w-max">
+        <button class="category-btn active px-5 py-2 rounded-full bg-primary text-white hover:bg-primary/90 transition-all">
+          全部
+        </button>
+        <button class="category-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all">
+          2K
+        </button>
+        <button class="category-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all">
+          4K
+        </button>
+        <button class="category-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all">
+          6K
+        </button>
+        <button class="category-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all">
+          8K
+        </button>
+        <button class="category-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all">
+          其他
+        </button>
+      </div>
+    </div>
+    
+    <!-- 画廊标题 -->
+    <div class="mb-8">
+      <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-shadow">精选作品集</h2>
+      <p class="text-gray-600 dark:text-gray-400 mt-2">探索来自全球艺术家的精彩作品</p>
+    </div>
+    
+    <!-- 图片画廊 - 瀑布流布局 -->
+    <div class="masonry-grid" id="gallery">
+      <!-- 图片项将通过JavaScript动态生成 -->
+    </div>
+    
+    <!-- 加载更多按钮 -->
+    <div class="mt-10 text-center">
+      <button id="load-more" class="px-8 py-3 rounded-full border border-primary text-primary hover:bg-primary hover:text-white transition-all duration-300 inline-flex items-center">
+        加载更多
+        <i class="fa fa-refresh ml-2"></i>
+      </button>
+    </div>
+  </main>
+  
+  <!-- 图片查看模态框 -->
+  <div id="image-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="modal-backdrop"></div>
+    <div class="relative z-10 max-w-5xl w-full max-h-[90vh] flex items-center justify-center p-4">
+      <button id="close-modal" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-colors">
+        <i class="fa fa-times"></i>
+      </button>
+      <button id="prev-image" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-colors">
+        <i class="fa fa-chevron-left"></i>
+      </button>
+      <button id="next-image" class="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-colors">
+        <i class="fa fa-chevron-right"></i>
+      </button>
+      <div class="max-w-full max-h-[80vh]">
+        <img id="modal-image" src="" alt="大图预览" class="max-w-full max-h-[80vh] object-contain">
+      </div>
+      <div class="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-sm text-white p-4 rounded-lg">
+        <h3 id="modal-title" class="text-xl font-semibold"></h3>
+        <p id="modal-desc" class="text-sm text-gray-300 mt-1"></p>
+        <div class="flex items-center mt-3 space-x-4">
+          <button class="flex items-center text-gray-300 hover:text-white transition-colors">
+            <i class="fa fa-heart-o mr-1"></i> 收藏
+          </button>
+          <button class="flex items-center text-gray-300 hover:text-white transition-colors">
+            <i class="fa fa-share-alt mr-1"></i> 分享
+          </button>
+          <button class="flex items-center text-gray-300 hover:text-white transition-colors">
+            <i class="fa fa-download mr-1"></i> 下载
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 页脚 -->
+  <footer class="bg-gray-100 dark:bg-gray-800/50 py-10 transition-colors duration-300">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div>
+          <h3 class="text-xl font-bold text-primary mb-4">艺术画廊</h3>
+          <p class="text-gray-600 dark:text-gray-400 mb-4">探索视觉艺术的无限可能，发现世界的美好瞬间。</p>
+          <div class="flex space-x-4">
+            <a href="#" class="text-gray-500 hover:text-primary transition-colors">
+              <i class="fa fa-instagram"></i>
+            </a>
+            <a href="#" class="text-gray-500 hover:text-primary transition-colors">
+              <i class="fa fa-twitter"></i>
+            </a>
+            <a href="#" class="text-gray-500 hover:text-primary transition-colors">
+              <i class="fa fa-facebook"></i>
+            </a>
+            <a href="#" class="text-gray-500 hover:text-primary transition-colors">
+              <i class="fa fa-pinterest"></i>
+            </a>
+          </div>
+        </div>
+        <br>
+        <div>
+          <h4 class="font-semibold mb-4">友情链接</h4>
+          <ul class="space-y-2">
+            <li><a href="https://blog.aerr.cn/" class="text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">青云博客</a></li>
+            <li><a href="http://dh.aerr.cn/" class="text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">导航页</a></li>
+          </ul>
+        </div>
+
+        
+
+      </div>
+      
+      <div class="border-t border-gray-200 dark:border-gray-700 mt-8 pt-8 text-center text-gray-500 dark:text-gray-500 text-sm">
+        <p>&copy; 2025 图库 . 青云依兮</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    // 画廊图片数据
+    const galleryImages = [
+      {
+        id: 1,
+        src: '/img/2k/ysw.png',
+        thumb: '/img/2k/ysw.png',
+        title: '2K',
+        description: '清晨的山间湖泊，薄雾缭绕，宛如仙境',
+        category: '2K'
+      },
+      {
+        id: 2,
+        src: '/img/2k/zzx.png',
+        thumb: '/img/2k/zzx.png',
+        title: '2K',
+        description: '繁华都市的天际线，夜幕下灯火辉煌',
+        category: '2K'
+      },
+      {
+        id: 3,
+        src: '/img/4k/dmsn.png',
+        thumb: '/img/4k/dmsn.png',
+        title: '4k',
+        description: '窗边沉思的少女，眼神中带着一丝忧郁',
+        category: '4k'
+      },
+      {
+        id: 4,
+        src: '/img/4k/ldjj.png',
+        thumb: '/img/4k/ldjj.png',
+        title: '4k',
+        description: '阳光透过树叶洒在森林小径上，形成斑驳的光影',
+        category: '4k'
+      },
+      {
+        id: 5,
+        src: '/img/4k/ldjj1.png',
+        thumb: '/img/4k/ldjj1.png',
+        title: '4k',
+        description: '几何线条构成的抽象艺术作品',
+        category: '4k'
+      },
+      {
+        id: 6,
+        src: '/img/4k/safg.png',
+        thumb: '/img/4k/safg.png',
+        title: '4k',
+        description: '午后阳光下小憩的猫咪，慵懒而惬意',
+        category: '4k'
+      },
+      {
+        id: 7,
+        src: '/img/4k/shanjianjieti.png',
+        thumb: '/img/4k/shanjianjieti.png',
+        title: '4k',
+        description: '古老建筑上精美的雕刻细节',
+        category: '4k'
+      },
+      {
+        id: 8,
+        src: '/img/4k/spfj.png',
+        thumb: '/img/4k/spfj.png',
+        title: '4k',
+        description: '精致的美食拼盘，色彩丰富，令人垂涎',
+        category: '4k'
+      },
+      {
+        id: 9,
+        src: '/img/4k/thzj.png',
+        thumb: '/img/4k/thzj.png',
+        title: '4k',
+        description: '雄伟的雪山，蓝天白云相映成趣',
+        category: '4k'
+      },
+      {
+        id: 10,
+        src: '/img/4k/xrbj.png',
+        thumb: '/img/4k/xrbj.png',
+        title: '4k',
+        description: '街头表演的艺人，专注而投入',
+        category: '4k'
+      },
+      {
+        id: 11,
+        src: '/img/4k/xyxz.png',
+        thumb: '/img/4k/xyxz.png',
+        title: '4k',
+        description: '忠诚的狗狗，眼神中充满了信任',
+        category: '4k'
+      },
+      {
+        id: 12,
+        src: '/img/6k/ktxx.png',
+        thumb: '/img/6k/ktxx.png',
+        title: '6K',
+        description: '清澈的海水下，鱼儿自由游弋',
+        category: '6K'
+      },
+      {
+        id: 13,
+        src: '/img/6k/tsxkac.png',
+        thumb: '/img/6k/tsxkac.png',
+        title: '6K',
+        description: '清澈的海水下，鱼儿自由游弋',
+        category: '6K'
+      },
+      {
+        id: 14,
+        src: '/img/8k/8kbz.png',
+        thumb: '/img/8k/8kbz.png',
+        title: '8K',
+        description: '清澈的海水下，鱼儿自由游弋',
+        category: '8K'
+      },
+      {
+        id: 15,
+        src: '/img/8k/dongman.png',
+        thumb: '/img/8k/dongman.png',
+        title: '8K',
+        description: '清澈的海水下，鱼儿自由游弋',
+        category: '8K'
+      },
+      {
+        id: 16,
+        src: '/img/8k/taikong.png',
+        thumb: '/img/8k/taikong.png',
+        title: '8K',
+        description: '清澈的海水下，鱼儿自由游弋',
+        category: '8K'
+      },
+      {
+        id: 17,
+        src: '/img/11.jpg',
+        thumb: '/img/11.jpg',
+        title: '其他',
+        description: '清澈的海水下，鱼儿自由游弋',
+        category: '其他'
+      },
+      {
+        id: 18,
+        src: '/img/20211126190312.jpg',
+        thumb: '/img/20211126190312.jpg',
+        title: '其他',
+        description: '清澈的海水下，鱼儿自由游弋',
+        category: '其他'
+      },
+      {
+        id: 19,
+        src: '/img/gifs.gif',
+        thumb: '/img/gifs.gif',
+        title: '其他',
+        description: '清澈的海水下，鱼儿自由游弋',
+        category: '其他'
+      },
+      {
+        id: 20,
+        src: '/img/fwgs.png',
+        thumb: '/img/fwgs.png',
+        title: '其他',
+        description: '清澈的海水下，鱼儿自由游弋',
+        category: '其他'
+      },
+      {
+        id: 21,
+        src: '/logo.jpg',
+        thumb: '/logo.jpg',
+        title: '其他',
+        description: '清澈的海水下，鱼儿自由游弋',
+        category: '其他'
+      }
+    ];
+
+    // 当前显示的图片
+    let currentImages = [...galleryImages];
+    let currentPage = 1;
+    const imagesPerPage = 8;
+    let currentImageIndex = 0;
+
+    // DOM元素
+    const galleryContainer = document.getElementById('gallery');
+    const loadMoreBtn = document.getElementById('load-more');
+    const imageModal = document.getElementById('image-modal');
+    const modalImage = document.getElementById('modal-image');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDesc = document.getElementById('modal-desc');
+    const closeModal = document.getElementById('close-modal');
+    const modalBackdrop = document.getElementById('modal-backdrop');
+    const prevImage = document.getElementById('prev-image');
+    const nextImage = document.getElementById('next-image');
+    const categoryBtns = document.querySelectorAll('.category-btn');
+    const themeToggle = document.getElementById('theme-toggle');
+    const navbar = document.getElementById('navbar');
+    const mobileSearchBtn = document.getElementById('mobile-search-btn');
+    const mobileSearch = document.getElementById('mobile-search');
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const searchInput = document.getElementById('search-input');
+
+    // 初始化页面
+    document.addEventListener('DOMContentLoaded', () => {
+      // 检查深色模式偏好
+      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      
+      renderGallery();
+      setupEventListeners();
+    });
+
+    // 渲染画廊
+    function renderGallery() {
+      const startIndex = (currentPage - 1) * imagesPerPage;
+      const endIndex = startIndex + imagesPerPage;
+      const imagesToRender = currentImages.slice(startIndex, endIndex);
+      
+      imagesToRender.forEach(image => {
+        const galleryItem = document.createElement('div');
+        galleryItem.className = 'masonry-item group relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1';
+        galleryItem.dataset.category = image.category;
+        
+        galleryItem.innerHTML = `
+          <div class="relative overflow-hidden">
+            <img 
+              src="${image.thumb}" 
+              data-src="${image.src}"
+              alt="${image.title}" 
+              class="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-500 lazy-load"
+            >
+            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+              <h3 class="text-white font-semibold text-lg">${image.title}</h3>
+              <p class="text-gray-200 text-sm mt-1">${image.description}</p>
+              <div class="flex items-center mt-3 space-x-3">
+                <button class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+                  <i class="fa fa-heart-o"></i>
+                </button>
+                <button class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+                  <i class="fa fa-share-alt"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        galleryItem.addEventListener('click', () => {
+          openImageModal(image);
+          currentImageIndex = currentImages.findIndex(img => img.id === image.id);
+        });
+        
+        galleryContainer.appendChild(galleryItem);
+      });
+      
+      // 检查是否还有更多图片
+      if (endIndex >= currentImages.length) {
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        loadMoreBtn.innerHTML = '没有更多图片了 <i class="fa fa-check ml-2"></i>';
+      } else {
+        loadMoreBtn.disabled = false;
+        loadMoreBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        loadMoreBtn.innerHTML = '加载更多 <i class="fa fa-refresh ml-2"></i>';
+      }
+      
+      // 图片懒加载
+      initLazyLoading();
+    }
+
+    // 初始化图片懒加载
+    function initLazyLoading() {
+      const lazyImages = document.querySelectorAll('.lazy-load');
+      
+      if ('IntersectionObserver' in window) {
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const image = entry.target;
+              image.src = image.dataset.src;
+              image.classList.remove('lazy-load');
+              imageObserver.unobserve(image);
+              
+              // 添加加载动画
+              image.style.opacity = '0';
+              image.style.transition = 'opacity 0.5s ease-in-out';
+              
+              image.onload = () => {
+                image.style.opacity = '1';
+              };
+            }
+          });
+        });
+        
+        lazyImages.forEach(image => {
+          imageObserver.observe(image);
+        });
+      } else {
+        // 降级处理
+        lazyImages.forEach(image => {
+          image.src = image.dataset.src;
+          image.classList.remove('lazy-load');
+        });
+      }
+    }
+
+    // 打开图片模态框
+    function openImageModal(image) {
+      modalImage.src = image.src;
+      modalTitle.textContent = image.title;
+      modalDesc.textContent = image.description;
+      imageModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      
+      // 添加淡入动画
+      setTimeout(() => {
+        imageModal.querySelector('div:nth-child(2)').classList.add('opacity-100');
+      }, 10);
+    }
+
+    // 关闭图片模态框
+    function closeImageModal() {
+      imageModal.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    // 显示上一张图片
+    function showPrevImage() {
+      currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length;
+      const image = currentImages[currentImageIndex];
+      modalImage.src = image.src;
+      modalTitle.textContent = image.title;
+      modalDesc.textContent = image.description;
+    }
+
+    // 显示下一张图片
+    function showNextImage() {
+      currentImageIndex = (currentImageIndex + 1) % currentImages.length;
+      const image = currentImages[currentImageIndex];
+      modalImage.src = image.src;
+      modalTitle.textContent = image.title;
+      modalDesc.textContent = image.description;
+    }
+
+    // 加载更多图片
+    function loadMoreImages() {
+      currentPage++;
+      renderGallery();
+    }
+
+    // 筛选分类
+    function filterByCategory(category) {
+      // 更新按钮状态
+      categoryBtns.forEach(btn => {
+        if (btn.textContent.trim() === category) {
+          btn.classList.add('bg-primary', 'text-white');
+          btn.classList.remove('bg-gray-100', 'dark:bg-gray-800', 'hover:bg-gray-200', 'dark:hover:bg-gray-700');
+        } else {
+          btn.classList.remove('bg-primary', 'text-white');
+          btn.classList.add('bg-gray-100', 'dark:bg-gray-800', 'hover:bg-gray-200', 'dark:hover:bg-gray-700');
+        }
+      });
+      
+      // 筛选图片
+      if (category === '全部') {
+        currentImages = [...galleryImages];
+      } else {
+        currentImages = galleryImages.filter(image => image.category === category);
+      }
+      
+      // 重置分页并重新渲染
+      galleryContainer.innerHTML = '';
+      currentPage = 1;
+      renderGallery();
+    }
+
+    // 搜索图片
+    function searchImages(query) {
+      query = query.toLowerCase().trim();
+      
+      if (query === '') {
+        currentImages = [...galleryImages];
+      } else {
+        currentImages = galleryImages.filter(image => 
+          image.title.toLowerCase().includes(query) || 
+          image.description.toLowerCase().includes(query) ||
+          image.category.toLowerCase().includes(query)
+        );
+      }
+      
+      // 重置分页并重新渲染
+      galleryContainer.innerHTML = '';
+      currentPage = 1;
+      renderGallery();
+    }
+
+    // 切换主题
+    function toggleTheme() {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.theme = 'light';
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.theme = 'dark';
+      }
+    }
+
+    // 处理滚动事件 - 导航栏样式变化
+    function handleScroll() {
+      if (window.scrollY > 50) {
+        navbar.classList.add('py-2', 'shadow');
+        navbar.classList.remove('py-4');
+      } else {
+        navbar.classList.add('py-4');
+        navbar.classList.remove('py-2', 'shadow');
+      }
+    }
+
+    // 设置事件监听器
+    function setupEventListeners() {
+      // 加载更多按钮
+      loadMoreBtn.addEventListener('click', loadMoreImages);
+      
+      // 模态框事件
+      closeModal.addEventListener('click', closeImageModal);
+      modalBackdrop.addEventListener('click', closeImageModal);
+      prevImage.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showPrevImage();
+      });
+      nextImage.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showNextImage();
+      });
+      
+      // 键盘导航
+      document.addEventListener('keydown', (e) => {
+        if (imageModal.classList.contains('hidden')) return;
+        
+        if (e.key === 'Escape') {
+          closeImageModal();
+        } else if (e.key === 'ArrowLeft') {
+          showPrevImage();
+        } else if (e.key === 'ArrowRight') {
+          showNextImage();
+        }
+      });
+      
+      // 分类筛选
+      categoryBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterByCategory(btn.textContent.trim());
+        });
+      });
+      
+      // 主题切换
+      themeToggle.addEventListener('click', toggleTheme);
+      
+      // 滚动事件
+      window.addEventListener('scroll', handleScroll);
+      
+      // 移动端搜索
+      mobileSearchBtn.addEventListener('click', () => {
+        mobileSearch.classList.toggle('hidden');
+        mobileMenu.classList.add('hidden');
+      });
+      
+      // 移动端菜单
+      mobileMenuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+        mobileSearch.classList.add('hidden');
+      });
+      
+      // 搜索功能
+      searchInput.addEventListener('input', (e) => {
+        searchImages(e.target.value);
+      });
+      
+      // 点击其他区域关闭移动端菜单和搜索
+      document.addEventListener('click', (e) => {
+        const isClickInside = mobileMenuBtn.contains(e.target) || 
+                             mobileMenu.contains(e.target) ||
+                             mobileSearchBtn.contains(e.target) ||
+                             mobileSearch.contains(e.target);
+                             
+        if (!isClickInside) {
+          mobileMenu.classList.add('hidden');
+          mobileSearch.classList.add('hidden');
+        }
+      });
+    }
+  </script>
+</body>
+</html>
