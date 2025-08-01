@@ -69,6 +69,15 @@
       .backdrop-blur {
         backdrop-filter: blur(8px);
       }
+      .media-badge {
+        @apply absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center z-10;
+      }
+      .media-badge-video {
+        @apply bg-red-500 text-white;
+      }
+      .media-badge-image {
+        @apply bg-green-500 text-white;
+      }
     }
   </style>
 </head>
@@ -79,7 +88,7 @@
     <div class="container mx-auto px-4 py-4 flex items-center justify-between backdrop-blur bg-light/80 dark:bg-dark/80 shadow-sm">
       <div class="flex items-center">
         <h1 class="text-2xl font-bold text-primary">
-          <i class="fa fa-camera-retro mr-2"></i>艺术画廊
+          <i class="fa fa-camera-retro mr-2"></i>艺术作品
         </h1>
       </div>
       
@@ -164,6 +173,9 @@
           8K
         </button>
         <button class="category-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all">
+          视频
+        </button>
+        <button class="category-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all">
           其他
         </button>
       </div>
@@ -194,7 +206,7 @@
     <div class="container mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
-          <h3 class="text-xl font-bold text-primary mb-4">艺术画廊</h3>
+          <h3 class="text-xl font-bold text-primary mb-4">艺术作品</h3>
           <p class="text-gray-600 dark:text-gray-400 mb-4">探索视觉艺术的无限可能，发现世界的美好瞬间。</p>
           <div class="flex space-x-4">
             <a href="#" class="text-gray-500 hover:text-primary transition-colors">
@@ -225,15 +237,15 @@
       </div>
       
       <div class="border-t border-gray-200 dark:border-gray-700 mt-8 pt-8 text-center text-gray-500 dark:text-gray-500 text-sm">
-        <p>&copy; 2025 图库 . 青云依兮</p>
+        <p>&copy; 2025 艺术作品 . 青云依兮</p>
       </div>
     </div>
   </footer>
 
   <!-- JavaScript -->
   <script>
-    // 画廊图片数据
-    const galleryImages = [
+    // 画廊媒体数据（包含图片和视频）
+    const galleryMedia = [
       {
         id: 1,
         src: '/img/2k/ysw.png',
@@ -241,6 +253,7 @@
         title: '2K',
         description: '清晨的山间湖泊，薄雾缭绕，宛如仙境',
         category: '2K'
+		type: 'image'
       },
       {
         id: 2,
@@ -249,6 +262,7 @@
         title: '2K',
         description: '繁华都市的天际线，夜幕下灯火辉煌',
         category: '2K'
+		type: 'image'
       },
       {
         id: 3,
@@ -257,6 +271,16 @@
         title: '4K',
         description: '窗边沉思的少女，眼神中带着一丝忧郁',
         category: '4K'
+		type: 'image'
+      },
+      {
+        id: 22,
+        src: '/video/daihaojie.mp4',
+        thumb: '/video/daihaojie.jpg',
+        title: '视频',
+        description: '窗边沉思的少女，眼神中带着一丝忧郁',
+        category: '视频'
+		type: 'video'
       },
       {
         id: 4,
@@ -265,6 +289,7 @@
         title: '4K',
         description: '阳光透过树叶洒在森林小径上，形成斑驳的光影',
         category: '4K'
+		type: 'image'
       },
       {
         id: 5,
@@ -273,6 +298,7 @@
         title: '4K',
         description: '几何线条构成的抽象艺术作品',
         category: '4K'
+		type: 'image'
       },
       {
         id: 6,
@@ -281,6 +307,7 @@
         title: '4K',
         description: '午后阳光下小憩的猫咪，慵懒而惬意',
         category: '4K'
+		type: 'image'
       },
       {
         id: 7,
@@ -289,6 +316,7 @@
         title: '4K',
         description: '古老建筑上精美的雕刻细节',
         category: '4K'
+		type: 'image'
       },
       {
         id: 8,
@@ -297,6 +325,7 @@
         title: '4K',
         description: '精致的美食拼盘，色彩丰富，令人垂涎',
         category: '4K'
+		type: 'image'
       },
       {
         id: 9,
@@ -305,6 +334,7 @@
         title: '4K',
         description: '雄伟的雪山，蓝天白云相映成趣',
         category: '4K'
+		type: 'image'
       },
       {
         id: 10,
@@ -313,6 +343,7 @@
         title: '4K',
         description: '街头表演的艺人，专注而投入',
         category: '4K'
+		type: 'image'
       },
       {
         id: 11,
@@ -321,6 +352,7 @@
         title: '4K',
         description: '忠诚的狗狗，眼神中充满了信任',
         category: '4K'
+		type: 'image'
       },
       {
         id: 12,
@@ -329,6 +361,7 @@
         title: '6K',
         description: '清澈的海水下，鱼儿自由游弋',
         category: '6K'
+		type: 'image'
       },
       {
         id: 13,
@@ -337,6 +370,7 @@
         title: '6K',
         description: '清澈的海水下，鱼儿自由游弋',
         category: '6K'
+		type: 'image'
       },
       {
         id: 14,
@@ -345,6 +379,7 @@
         title: '8K',
         description: '清澈的海水下，鱼儿自由游弋',
         category: '8K'
+		type: 'image'
       },
       {
         id: 15,
@@ -353,6 +388,7 @@
         title: '8K',
         description: '清澈的海水下，鱼儿自由游弋',
         category: '8K'
+		type: 'image'
       },
       {
         id: 16,
@@ -361,6 +397,7 @@
         title: '8K',
         description: '清澈的海水下，鱼儿自由游弋',
         category: '8K'
+		type: 'image'
       },
       {
         id: 17,
@@ -369,6 +406,7 @@
         title: '其他',
         description: '清澈的海水下，鱼儿自由游弋',
         category: '其他'
+		type: 'image'
       },
       {
         id: 18,
@@ -377,6 +415,7 @@
         title: '其他',
         description: '清澈的海水下，鱼儿自由游弋',
         category: '其他'
+		type: 'image'
       },
       {
         id: 19,
@@ -385,6 +424,7 @@
         title: '其他',
         description: '清澈的海水下，鱼儿自由游弋',
         category: '其他'
+		type: 'image'
       },
       {
         id: 20,
@@ -393,6 +433,7 @@
         title: '其他',
         description: '清澈的海水下，鱼儿自由游弋',
         category: '其他'
+		type: 'image'
       },
       {
         id: 21,
@@ -401,13 +442,14 @@
         title: '其他',
         description: '清澈的海水下，鱼儿自由游弋',
         category: '其他'
+		type: 'image'
       }
     ];
 
-    // 当前显示的图片
-    let currentImages = [...galleryImages];
+    // 当前显示的媒体
+    let currentMedia = [...galleryMedia];
     let currentPage = 1;
-    const imagesPerPage = 8;
+    const mediaPerPage = 8;
 
     // DOM元素
     const galleryContainer = document.getElementById('gallery');
@@ -444,20 +486,20 @@
       Fancybox.bind('[data-fancybox]', {
         // 自定义标题
         caption: function(fancybox, carousel, slide) {
-          const image = currentImages.find(img => img.src === slide.src);
-          if (image) {
+          const media = currentMedia.find(item => item.src === slide.src);
+          if (media) {
             return `
               <div class="text-white">
-                <h3 class="text-xl font-bold">${image.title}</h3>
-                <p class="mt-1">${image.description}</p>
+                <h3 class="text-xl font-bold">${media.title}</h3>
+                <p class="mt-1">${media.description}</p>
                 <div class="flex items-center mt-3 space-x-4">
                   <button class="flex items-center text-gray-300 hover:text-white transition-colors" 
-                          onclick="Fancybox.getInstance().close(); copyImageAddress('${image.src}')">
-                    <i class="fa fa-link mr-1"></i> 复制图片地址
+                          onclick="Fancybox.getInstance().close(); copyMediaAddress('${media.src}')">
+                    <i class="fa fa-link mr-1"></i> 复制${media.type === 'video' ? '视频' : '图片'}地址
                   </button>
                   <button class="flex items-center text-gray-300 hover:text-white transition-colors"
-                          onclick="Fancybox.getInstance().close(); window.open('${image.src}', '_blank')">
-                    <i class="fa fa-download mr-1"></i> 下载图片
+                          onclick="Fancybox.getInstance().close(); window.open('${media.src}', '_blank')">
+                    <i class="fa fa-download mr-1"></i> 下载${media.type === 'video' ? '视频' : '图片'}
                   </button>
                 </div>
               </div>
@@ -506,39 +548,45 @@
 
     // 渲染画廊
     function renderGallery() {
-      const startIndex = (currentPage - 1) * imagesPerPage;
-      const endIndex = startIndex + imagesPerPage;
-      const imagesToRender = currentImages.slice(startIndex, endIndex);
+      const startIndex = (currentPage - 1) * mediaPerPage;
+      const endIndex = startIndex + mediaPerPage;
+      const mediaToRender = currentMedia.slice(startIndex, endIndex);
       
-      imagesToRender.forEach(image => {
+      mediaToRender.forEach(media => {
         const galleryItem = document.createElement('div');
         galleryItem.className = 'masonry-item group relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1';
-        galleryItem.dataset.category = image.category;
+        galleryItem.dataset.category = media.category;
+        
+        // 确定媒体类型图标和样式
+        const mediaBadge = media.type === 'video' 
+          ? '<div class="media-badge media-badge-video"><i class="fa fa-play"></i></div>'
+          : '<div class="media-badge media-badge-image"><i class="fa fa-picture-o"></i></div>';
         
         // 使用Fancybox的data属性
         galleryItem.innerHTML = `
           <div class="relative overflow-hidden">
-            <a href="${image.src}" 
+            ${mediaBadge} <!-- 媒体类型标识 -->
+            <a href="${media.src}" 
                data-fancybox="gallery" 
-               data-caption="${image.title}"
+               data-caption="${media.title}"
                class="block cursor-zoom-in"
-               data-image-id="${image.id}">
+               data-media-id="${media.id}">
               <img 
-                src="${image.thumb}" 
-                data-src="${image.src}"
-                alt="${image.title}" 
+                src="${media.thumb}" 
+                data-src="${media.thumb}"
+                alt="${media.title}" 
                 class="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-500 lazy-load"
               >
               <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                <h3 class="text-white font-semibold text-lg">${image.title}</h3>
-                <p class="text-gray-200 text-sm mt-1">${image.description}</p>
+                <h3 class="text-white font-semibold text-lg">${media.title}</h3>
+                <p class="text-gray-200 text-sm mt-1">${media.description}</p>
                 <div class="flex items-center mt-3 space-x-3">
                   <button class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
-                          onclick="event.preventDefault(); event.stopPropagation(); copyImageAddress('${image.src}')">
+                          onclick="event.preventDefault(); event.stopPropagation(); copyMediaAddress('${media.src}')">
                     <i class="fa fa-link"></i>
                   </button>
                   <button class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
-                          onclick="event.preventDefault(); event.stopPropagation(); window.open('${image.src}', '_blank')">
+                          onclick="event.preventDefault(); event.stopPropagation(); window.open('${media.src}', '_blank')">
                     <i class="fa fa-download"></i>
                   </button>
                 </div>
@@ -550,11 +598,11 @@
         galleryContainer.appendChild(galleryItem);
       });
       
-      // 检查是否还有更多图片
-      if (endIndex >= currentImages.length) {
+      // 检查是否还有更多媒体
+      if (endIndex >= currentMedia.length) {
         loadMoreBtn.disabled = true;
         loadMoreBtn.classList.add('opacity-50', 'cursor-not-allowed');
-        loadMoreBtn.innerHTML = '没有更多图片了 <i class="fa fa-check ml-2"></i>';
+        loadMoreBtn.innerHTML = '没有更多内容了 <i class="fa fa-check ml-2"></i>';
       } else {
         loadMoreBtn.disabled = false;
         loadMoreBtn.classList.remove('opacity-50', 'cursor-not-allowed');
@@ -601,13 +649,17 @@
       }
     }
 
-    // 复制图片地址
-    function copyImageAddress(url) {
+    // 复制媒体地址
+    function copyMediaAddress(url) {
+      // 找到对应的媒体项以确定类型
+      const media = currentMedia.find(item => item.src === url);
+      const mediaType = media ? media.type : '媒体';
+      
       navigator.clipboard.writeText(url).then(() => {
         // 创建临时提示元素
         const toast = document.createElement('div');
         toast.className = 'fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all duration-300 opacity-0';
-        toast.textContent = '图片地址已复制!';
+        toast.textContent = `${mediaType === 'video' ? '视频' : '图片'}地址已复制!`;
         document.body.appendChild(toast);
         
         // 显示提示
@@ -623,12 +675,12 @@
           }, 300);
         }, 3000);
       }).catch(err => {
-        console.error('无法复制图片地址: ', err);
-        alert('复制失败，请手动复制图片地址');
+        console.error('无法复制地址: ', err);
+        alert(`复制失败，请手动复制${mediaType === 'video' ? '视频' : '图片'}地址`);
       });
     }
 
-    // 加载更多图片
+    // 加载更多媒体
     function loadMoreImages() {
       currentPage++;
       renderGallery();
@@ -647,11 +699,11 @@
         }
       });
       
-      // 筛选图片
+      // 筛选媒体
       if (category === '全部') {
-        currentImages = [...galleryImages];
+        currentMedia = [...galleryMedia];
       } else {
-        currentImages = galleryImages.filter(image => image.category === category);
+        currentMedia = galleryMedia.filter(media => media.category === category);
       }
       
       // 重置Fancybox和分页并重新渲染
@@ -662,17 +714,18 @@
       initFancybox();
     }
 
-    // 搜索图片
+    // 搜索媒体
     function searchImages(query) {
       query = query.toLowerCase().trim();
       
       if (query === '') {
-        currentImages = [...galleryImages];
+        currentMedia = [...galleryMedia];
       } else {
-        currentImages = galleryImages.filter(image => 
-          image.title.toLowerCase().includes(query) || 
-          image.description.toLowerCase().includes(query) ||
-          image.category.toLowerCase().includes(query)
+        currentMedia = galleryMedia.filter(media => 
+          media.title.toLowerCase().includes(query) || 
+          media.description.toLowerCase().includes(query) ||
+          media.category.toLowerCase().includes(query) ||
+          media.type.toLowerCase().includes(query) // 允许搜索"视频"或"图片"
         );
       }
       
