@@ -7,11 +7,14 @@
   <meta itemprop="image" content="/logo.jpg">
   <meta name="description" itemprop="description" content="图库 | 探索视觉艺术的无限可能，发现世界的美好瞬间。">
   <link rel="shortcut icon" href="/logo.jpg">
-  <!-- 引入Tailwind CSS -->
-  <script src="/3.4.17.css"></script>
+ <!-- 引入Tailwind CSS -->
+  <script src="/css/3.4.17.css"></script>
   <!-- 引入Font Awesome -->
-  <link href="/font-awesome.min.css" rel="stylesheet">
-
+  <link href="/css/font-awesome.min.css" rel="stylesheet">
+  <!-- 引入Fancybox -->
+  <link rel="stylesheet" href="/css/fancybox.css">
+  <script src="/js/fancybox.umd.js"></script>
+  
   <!-- Tailwind配置 -->
   <script>
     tailwind.config = {
@@ -76,7 +79,7 @@
     <div class="container mx-auto px-4 py-4 flex items-center justify-between backdrop-blur bg-light/80 dark:bg-dark/80 shadow-sm">
       <div class="flex items-center">
         <h1 class="text-2xl font-bold text-primary">
-          <i class="fa fa-camera-retro mr-2"></i>图库
+          <i class="fa fa-camera-retro mr-2"></i>艺术画廊
         </h1>
       </div>
       
@@ -118,6 +121,7 @@
           type="text" 
           placeholder="搜索图片..." 
           class="w-full pl-10 pr-4 py-2 rounded-full bg-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+          id="mobile-search-input"
         >
         <i class="fa fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
       </div>
@@ -185,41 +189,7 @@
     </div>
   </main>
   
-  <!-- 图片查看模态框 -->
-  <div id="image-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
-    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="modal-backdrop"></div>
-    <div class="relative z-10 max-w-5xl w-full max-h-[90vh] flex items-center justify-center p-4">
-      <button id="close-modal" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-colors">
-        <i class="fa fa-times"></i>
-      </button>
-      <button id="prev-image" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-colors">
-        <i class="fa fa-chevron-left"></i>
-      </button>
-      <button id="next-image" class="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-colors">
-        <i class="fa fa-chevron-right"></i>
-      </button>
-      <div class="max-w-full max-h-[80vh]">
-        <img id="modal-image" src="" alt="大图预览" class="max-w-full max-h-[80vh] object-contain">
-      </div>
-      <div class="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-sm text-white p-4 rounded-lg">
-        <h3 id="modal-title" class="text-xl font-semibold"></h3>
-        <p id="modal-desc" class="text-sm text-gray-300 mt-1"></p>
-        <div class="flex items-center mt-3 space-x-4">
-          <button class="flex items-center text-gray-300 hover:text-white transition-colors">
-            <i class="fa fa-heart-o mr-1"></i> 收藏
-          </button>
-          <button class="flex items-center text-gray-300 hover:text-white transition-colors">
-            <i class="fa fa-share-alt mr-1"></i> 分享
-          </button>
-          <button class="flex items-center text-gray-300 hover:text-white transition-colors">
-            <i class="fa fa-download mr-1"></i> 下载
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- 页脚 -->
+   <!-- 页脚 -->
   <footer class="bg-gray-100 dark:bg-gray-800/50 py-10 transition-colors duration-300">
     <div class="container mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -438,19 +408,10 @@
     let currentImages = [...galleryImages];
     let currentPage = 1;
     const imagesPerPage = 8;
-    let currentImageIndex = 0;
 
     // DOM元素
     const galleryContainer = document.getElementById('gallery');
     const loadMoreBtn = document.getElementById('load-more');
-    const imageModal = document.getElementById('image-modal');
-    const modalImage = document.getElementById('modal-image');
-    const modalTitle = document.getElementById('modal-title');
-    const modalDesc = document.getElementById('modal-desc');
-    const closeModal = document.getElementById('close-modal');
-    const modalBackdrop = document.getElementById('modal-backdrop');
-    const prevImage = document.getElementById('prev-image');
-    const nextImage = document.getElementById('next-image');
     const categoryBtns = document.querySelectorAll('.category-btn');
     const themeToggle = document.getElementById('theme-toggle');
     const navbar = document.getElementById('navbar');
@@ -459,6 +420,7 @@
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
     const searchInput = document.getElementById('search-input');
+    const mobileSearchInput = document.getElementById('mobile-search-input');
 
     // 初始化页面
     document.addEventListener('DOMContentLoaded', () => {
@@ -469,9 +431,78 @@
         document.documentElement.classList.remove('dark');
       }
       
+      // 初始化Fancybox
+      initFancybox();
+      
       renderGallery();
       setupEventListeners();
     });
+
+    // 初始化Fancybox
+    function initFancybox() {
+      // 配置Fancybox
+      Fancybox.bind('[data-fancybox]', {
+        // 自定义标题
+        caption: function(fancybox, carousel, slide) {
+          const image = currentImages.find(img => img.src === slide.src);
+          if (image) {
+            return `
+              <div class="text-white">
+                <h3 class="text-xl font-bold">${image.title}</h3>
+                <p class="mt-1">${image.description}</p>
+                <div class="flex items-center mt-3 space-x-4">
+                  <button class="flex items-center text-gray-300 hover:text-white transition-colors" 
+                          onclick="Fancybox.getInstance().close(); copyImageAddress('${image.src}')">
+                    <i class="fa fa-link mr-1"></i> 复制图片地址
+                  </button>
+                  <button class="flex items-center text-gray-300 hover:text-white transition-colors"
+                          onclick="Fancybox.getInstance().close(); window.open('${image.src}', '_blank')">
+                    <i class="fa fa-download mr-1"></i> 下载图片
+                  </button>
+                </div>
+              </div>
+            `;
+          }
+          return '';
+        },
+        // 动画效果
+        animationEffect: "zoom-in-out",
+        // 过渡速度
+        animationDuration: 500,
+        // 键盘导航
+        keyboard: {
+          Escape: "close",
+          Delete: "close",
+          Backspace: "close",
+          ArrowLeft: "prev",
+          ArrowRight: "next",
+          PageUp: "prev",
+          PageDown: "next",
+          Home: "first",
+          End: "last",
+        },
+        // 工具栏配置
+        Toolbar: {
+          display: {
+            left: ["infobar"],
+            middle: [],
+            right: ["close"],
+          },
+        },
+        // 全屏选项
+        fullScreen: {
+          autoStart: false,
+        },
+        // 点击背景关闭
+        closeOnClick: "outside",
+        // 触摸缩放
+        touch: {
+          zoom: true,
+          pan: true,
+          forceTouch: false,
+        },
+      });
+    }
 
     // 渲染画廊
     function renderGallery() {
@@ -484,33 +515,37 @@
         galleryItem.className = 'masonry-item group relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1';
         galleryItem.dataset.category = image.category;
         
+        // 使用Fancybox的data属性
         galleryItem.innerHTML = `
           <div class="relative overflow-hidden">
-            <img 
-              src="${image.thumb}" 
-              data-src="${image.src}"
-              alt="${image.title}" 
-              class="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-500 lazy-load"
-            >
-            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-              <h3 class="text-white font-semibold text-lg">${image.title}</h3>
-              <p class="text-gray-200 text-sm mt-1">${image.description}</p>
-              <div class="flex items-center mt-3 space-x-3">
-                <button class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors">
-                  <i class="fa fa-heart-o"></i>
-                </button>
-                <button class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors">
-                  <i class="fa fa-share-alt"></i>
-                </button>
+            <a href="${image.src}" 
+               data-fancybox="gallery" 
+               data-caption="${image.title}"
+               class="block cursor-zoom-in"
+               data-image-id="${image.id}">
+              <img 
+                src="${image.thumb}" 
+                data-src="${image.src}"
+                alt="${image.title}" 
+                class="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-500 lazy-load"
+              >
+              <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                <h3 class="text-white font-semibold text-lg">${image.title}</h3>
+                <p class="text-gray-200 text-sm mt-1">${image.description}</p>
+                <div class="flex items-center mt-3 space-x-3">
+                  <button class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+                          onclick="event.preventDefault(); event.stopPropagation(); copyImageAddress('${image.src}')">
+                    <i class="fa fa-link"></i>
+                  </button>
+                  <button class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+                          onclick="event.preventDefault(); event.stopPropagation(); window.open('${image.src}', '_blank')">
+                    <i class="fa fa-download"></i>
+                  </button>
+                </div>
               </div>
-            </div>
+            </a>
           </div>
         `;
-        
-        galleryItem.addEventListener('click', () => {
-          openImageModal(image);
-          currentImageIndex = currentImages.findIndex(img => img.id === image.id);
-        });
         
         galleryContainer.appendChild(galleryItem);
       });
@@ -566,42 +601,31 @@
       }
     }
 
-    // 打开图片模态框
-    function openImageModal(image) {
-      modalImage.src = image.src;
-      modalTitle.textContent = image.title;
-      modalDesc.textContent = image.description;
-      imageModal.classList.remove('hidden');
-      document.body.style.overflow = 'hidden';
-      
-      // 添加淡入动画
-      setTimeout(() => {
-        imageModal.querySelector('div:nth-child(2)').classList.add('opacity-100');
-      }, 10);
-    }
-
-    // 关闭图片模态框
-    function closeImageModal() {
-      imageModal.classList.add('hidden');
-      document.body.style.overflow = '';
-    }
-
-    // 显示上一张图片
-    function showPrevImage() {
-      currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length;
-      const image = currentImages[currentImageIndex];
-      modalImage.src = image.src;
-      modalTitle.textContent = image.title;
-      modalDesc.textContent = image.description;
-    }
-
-    // 显示下一张图片
-    function showNextImage() {
-      currentImageIndex = (currentImageIndex + 1) % currentImages.length;
-      const image = currentImages[currentImageIndex];
-      modalImage.src = image.src;
-      modalTitle.textContent = image.title;
-      modalDesc.textContent = image.description;
+    // 复制图片地址
+    function copyImageAddress(url) {
+      navigator.clipboard.writeText(url).then(() => {
+        // 创建临时提示元素
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all duration-300 opacity-0';
+        toast.textContent = '图片地址已复制!';
+        document.body.appendChild(toast);
+        
+        // 显示提示
+        setTimeout(() => {
+          toast.classList.add('opacity-100');
+        }, 10);
+        
+        // 3秒后隐藏并移除提示
+        setTimeout(() => {
+          toast.classList.remove('opacity-100');
+          setTimeout(() => {
+            document.body.removeChild(toast);
+          }, 300);
+        }, 3000);
+      }).catch(err => {
+        console.error('无法复制图片地址: ', err);
+        alert('复制失败，请手动复制图片地址');
+      });
     }
 
     // 加载更多图片
@@ -630,10 +654,12 @@
         currentImages = galleryImages.filter(image => image.category === category);
       }
       
-      // 重置分页并重新渲染
+      // 重置Fancybox和分页并重新渲染
+      Fancybox.destroy();
       galleryContainer.innerHTML = '';
       currentPage = 1;
       renderGallery();
+      initFancybox();
     }
 
     // 搜索图片
@@ -650,10 +676,12 @@
         );
       }
       
-      // 重置分页并重新渲染
+      // 重置Fancybox和分页并重新渲染
+      Fancybox.destroy();
       galleryContainer.innerHTML = '';
       currentPage = 1;
       renderGallery();
+      initFancybox();
     }
 
     // 切换主题
@@ -665,6 +693,10 @@
         document.documentElement.classList.add('dark');
         localStorage.theme = 'dark';
       }
+      
+      // 主题切换后重新初始化Fancybox以适应新主题
+      Fancybox.destroy();
+      initFancybox();
     }
 
     // 处理滚动事件 - 导航栏样式变化
@@ -682,31 +714,6 @@
     function setupEventListeners() {
       // 加载更多按钮
       loadMoreBtn.addEventListener('click', loadMoreImages);
-      
-      // 模态框事件
-      closeModal.addEventListener('click', closeImageModal);
-      modalBackdrop.addEventListener('click', closeImageModal);
-      prevImage.addEventListener('click', (e) => {
-        e.stopPropagation();
-        showPrevImage();
-      });
-      nextImage.addEventListener('click', (e) => {
-        e.stopPropagation();
-        showNextImage();
-      });
-      
-      // 键盘导航
-      document.addEventListener('keydown', (e) => {
-        if (imageModal.classList.contains('hidden')) return;
-        
-        if (e.key === 'Escape') {
-          closeImageModal();
-        } else if (e.key === 'ArrowLeft') {
-          showPrevImage();
-        } else if (e.key === 'ArrowRight') {
-          showNextImage();
-        }
-      });
       
       // 分类筛选
       categoryBtns.forEach(btn => {
@@ -735,6 +742,11 @@
       
       // 搜索功能
       searchInput.addEventListener('input', (e) => {
+        searchImages(e.target.value);
+      });
+      
+      // 移动端搜索功能
+      mobileSearchInput.addEventListener('input', (e) => {
         searchImages(e.target.value);
       });
       
